@@ -2,23 +2,35 @@ package com.mehcode.reactnative.splashscreen;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
-class SplashScreen extends ReactContextBaseJavaModule {
-    Activity mActivity;
+class SplashScreen extends ReactContextBaseJavaModule implements LifecycleEventListener {
     Dialog mSplashDialog;
+    private boolean splashed;
 
-    public SplashScreen(ReactApplicationContext reactContext, Activity activity) {
+    public SplashScreen(ReactApplicationContext reactContext) {
         super(reactContext);
-        mActivity = activity;
 
-        // Immediately show the splash screen (again) when we get here
+        reactContext.addLifecycleEventListener(this);
+    }
+
+    @Override
+    public void onHostResume() {
+        if (splashed) return;
+        splashed = true;
         show();
+    }
+
+    @Override
+    public void onHostPause() {
+    }
+
+    @Override
+    public void onHostDestroy() {
     }
 
     @Override
@@ -27,20 +39,25 @@ class SplashScreen extends ReactContextBaseJavaModule {
     }
 
     void show() {
+        splashed = true;
         if (mSplashDialog != null && mSplashDialog.isShowing()) {
             // Splash screen is open
             return;
         }
 
-        mActivity.runOnUiThread(new Runnable() {
+        final Activity activity = getCurrentActivity();
+        if (activity == null) {
+            return;
+        }
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (mSplashDialog == null) {
-                    mSplashDialog = new Dialog(mActivity, R.style.SplashTheme);
+                    mSplashDialog = new Dialog(activity, R.style.SplashTheme);
                     mSplashDialog.setCancelable(false);
                 }
 
-                if (!mActivity.isFinishing()) {
+                if (!activity.isFinishing()) {
                     mSplashDialog.show();
                 }
             }
@@ -57,7 +74,11 @@ class SplashScreen extends ReactContextBaseJavaModule {
             return;
         }
 
-        mActivity.runOnUiThread(new Runnable() {
+        final Activity activity = getCurrentActivity();
+        if (activity == null) {
+            return;
+        }
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mSplashDialog.dismiss();

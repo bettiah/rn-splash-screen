@@ -1,7 +1,5 @@
 package com.mehcode.reactnative.splashscreen;
 
-import android.app.Activity;
-
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
@@ -13,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class SplashScreenPackage implements ReactPackage {
-    private Activity mActivity;
-
     @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
@@ -30,12 +26,8 @@ public class SplashScreenPackage implements ReactPackage {
             ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new SplashScreen(reactContext, mActivity));
+        modules.add(new SplashScreen(reactContext));
 
         return modules;
-    }
-
-    public void setActivity(final Activity activity) {
-        mActivity = activity;
     }
 }
